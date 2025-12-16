@@ -1,4 +1,4 @@
-# 🖥️📦 TUGAS BASIS DATA LANJUT  
+# 🖥️📦 FINAL PROJEK BASIS DATA LANJUT  
 ## Sistem Manajemen Toko Skincare (Kasir & Admin)
 
 *Implementasi Database Terstruktur dan Integrasi Java Swing (JDBC)*
@@ -27,7 +27,8 @@ Seluruh data dikelola menggunakan database relasional dengan penerapan relasi an
 - Melakukan restok barang  
 - Melihat riwayat penjualan  
 - Melihat detail barang terjual  
-- Memantau stok menipis, barang terlaris, total transaksi, dan omzet harian  
+- Memantau stok menipis, barang terlaris, total transaksi, dan omzet harian
+- Admin juga bisa melakukan peran kasir, dengam klik fitur mode kasir 
 
 ---
 
@@ -146,7 +147,11 @@ Admin dapat melihat riwayat pembayaran dari transaksi yang telah dilakukan.
 ---
 
 ## 👨‍💻 Author
-Satria  
+Kelompok 2
+- Ryo Satriagung Hidayat / 09010624015
+- Evania Dwi Ananta / 09010624007
+- Riska Amelia P / 09020624062
+
 Program Studi Sistem Informasi  
 Universitas Islam Negeri Sunan Ampel Surabaya  
 2025  
