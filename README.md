@@ -147,7 +147,7 @@ Admin dapat melihat riwayat pembayaran dari transaksi yang telah dilakukan.
 ---
 
 ## 👨‍💻 Author
-Kelompok 2
+KELOMPOK 1 :
 - Ryo Satriagung Hidayat / 09010624015
 - Evania Dwi Ananta / 09010624007
 - Riska Amelia P / 09020624062
