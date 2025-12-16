@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="struk_pembayaran" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="d20b7438-03fa-41c2-ba9a-6119bfb69280">
+	<property name="ireport.zoom" value="1.2100000000000006"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="id_pembayaran" class="java.lang.String"/>
+	<parameter name="nama_kasir" class="java.lang.String"/>
+	<parameter name="tanggal_struk" class="java.lang.String"/>
+	<queryString>
+		<![CDATA[SELECT 
+    p.id_pembayaran,
+    p.id_penjualan,
+    p.tanggal_pembayaran,
+    p.jumlah_bayar,
+    pj.total,
+    (p.jumlah_bayar - pj.total) AS kembalian,
+    jp.nama_jenis
+FROM pembayaran p
+JOIN penjualan pj ON p.id_penjualan = pj.id_penjualan
+JOIN jenis_pembayaran jp ON p.id_jenis = jp.id_jenis
+WHERE p.id_pembayaran = $P{id_pembayaran}]]>
+	</queryString>
+	<field name="id_pembayaran" class="java.lang.String"/>
+	<field name="id_penjualan" class="java.lang.String"/>
+	<field name="tanggal_pembayaran" class="java.sql.Date"/>
+	<field name="jumlah_bayar" class="java.math.BigDecimal"/>
+	<field name="total" class="java.math.BigDecimal"/>
+	<field name="kembalian" class="java.math.BigDecimal"/>
+	<field name="nama_jenis" class="java.lang.String"/>
+	<title>
+		<band height="79">
+			<staticText>
+				<reportElement x="249" y="0" width="100" height="20" uuid="3c2dd902-c1ff-45ec-965d-5b0c4aee33bc"/>
+				<textElement>
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[NYK SKINCARE]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="50" y="20" width="500" height="33" uuid="a7493f55-4127-4b40-87c5-6438ce151077"/>
+				<textElement textAlignment="Center"/>
+				<text><![CDATA[Jl. Raya Rungkut Madya No.21, Surabaya, Jawa Timur 60293
+Telp. (031) 8890 1122 | Email: contact@nykskincare.com]]></text>
+			</staticText>
+			<line>
+				<reportElement x="12" y="78" width="555" height="1" uuid="23616749-3c97-4057-baed-3f1f16b46c2d"/>
+			</line>
+		</band>
+	</title>
+	<pageHeader>
+		<band height="35">
+			<staticText>
+				<reportElement x="180" y="6" width="220" height="27" uuid="43859573-f254-4753-885a-15429748bcec"/>
+				<textElement>
+					<font size="18" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Struk Pembayaran]]></text>
+			</staticText>
+		</band>
+	</pageHeader>
+	<detail>
+		<band height="420">
+			<staticText>
+				<reportElement x="56" y="16" width="120" height="20" uuid="aa656b94-880e-4123-bad9-bf737ee19737"/>
+				<text><![CDATA[ID Pembayaran]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="275" y="16" width="200" height="20" uuid="86dc9234-ea08-4310-aece-0915b6b8cc00"/>
+				<textFieldExpression><![CDATA[$F{id_pembayaran}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="56" y="61" width="120" height="20" uuid="9e5b166e-c72b-4a3e-8ce3-15f36c47a331"/>
+				<text><![CDATA[ID Penjualan]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="275" y="61" width="200" height="20" uuid="e6f8dade-7a9a-49a9-83fb-6dec93301f8a"/>
+				<textFieldExpression><![CDATA[$F{id_penjualan}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="56" y="98" width="150" height="20" uuid="0a90f103-a13e-4845-bddc-936dab13e85e"/>
+				<text><![CDATA[Tanggal Pembayaran]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="275" y="98" width="200" height="20" uuid="80345a97-1e69-40d4-809d-38a149e2221e"/>
+				<textFieldExpression><![CDATA[$F{tanggal_pembayaran}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="56" y="158" width="150" height="20" uuid="6fa15fad-5562-421b-a49d-29aad075a0cf"/>
+				<text><![CDATA[Jumlah Bayar]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="275" y="158" width="200" height="20" uuid="26af0572-e730-4e32-96c6-c95a50a5319e"/>
+				<textFieldExpression><![CDATA[$F{jumlah_bayar}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="56" y="195" width="150" height="20" uuid="50060460-9fc5-4621-acfa-88b4cb5d5a65"/>
+				<text><![CDATA[Total]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="275" y="195" width="200" height="20" uuid="e506c4a8-1bb6-4f41-a578-abf5b9d1af95"/>
+				<textFieldExpression><![CDATA[$F{total}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="56" y="246" width="150" height="20" uuid="493093db-aeb4-431e-b4ad-4706ed8250a1"/>
+				<text><![CDATA[Kembalian]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="275" y="246" width="200" height="20" uuid="d2e2c7ed-5d22-4b95-b9c8-69a686f7c02c"/>
+				<textFieldExpression><![CDATA[$F{kembalian}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="56" y="295" width="150" height="20" uuid="6d26f54e-7bf2-42b2-b6b7-4519bb462ece"/>
+				<text><![CDATA[Metode Pembayaran]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="275" y="295" width="200" height="20" uuid="132b6fc2-f18e-47a5-8c2d-af5a1259211d"/>
+				<textFieldExpression><![CDATA[$F{nama_jenis}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="56" y="328" width="150" height="20" uuid="ad290b7e-82c9-4693-8db5-e4f7e777a174"/>
+				<text><![CDATA[Nama Kasir]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="275" y="328" width="200" height="20" uuid="bf166181-1a35-44a2-b61c-97bbe26bafad"/>
+				<textFieldExpression><![CDATA[$P{nama_kasir}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="56" y="368" width="150" height="20" uuid="7e75ae46-4f33-4c65-b224-5f476495e352"/>
+				<text><![CDATA[Tanggal Struk]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="275" y="368" width="200" height="20" uuid="fe6968f0-8dd6-4c32-80d0-40b35411e849"/>
+				<textFieldExpression><![CDATA[$P{tanggal_struk}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+</jasperReport>

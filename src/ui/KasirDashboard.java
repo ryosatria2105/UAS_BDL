@@ -1,0 +1,949 @@
+/*
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+ * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
+ */
+package ui;
+
+import Dialog.DialogPembayaran;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.awt.CardLayout;
+import static java.awt.GridBagConstraints.BOTH;
+import java.util.ArrayList;
+import java.util.List;
+import javax.swing.JFrame;
+import javax.swing.JOptionPane;
+import javax.swing.table.DefaultTableModel;
+import model.Barang;
+import service.BarangService;
+import util.DBConnection;
+import java.sql.ResultSet;
+
+
+
+/**
+ *
+ * @author ryo not rio
+ */
+public class KasirDashboard extends javax.swing.JFrame {
+    
+     private String namaUser;
+     private String idPegawaiLogin;
+    
+
+
+    /**
+     * Creates new form KasirDashboard
+     */
+public KasirDashboard(String idPegawai, String nama) {
+
+    this.idPegawaiLogin = idPegawai;
+    this.namaUser = nama;
+    initComponents();
+    
+    // === AUTO SUGGEST PEMBELI ===
+txtNamaPembeli.getDocument().addDocumentListener(new javax.swing.event.DocumentListener() {
+    public void insertUpdate(javax.swing.event.DocumentEvent e) {
+        cariPembeliByNama();
+    }
+    public void removeUpdate(javax.swing.event.DocumentEvent e) {
+        cariPembeliByNama();
+    }
+    public void changedUpdate(javax.swing.event.DocumentEvent e) {
+        cariPembeliByNama();
+    }
+
+        private void cariPembeliByNama() {
+             String keyword = txtNamaPembeli.getText().trim();
+
+    // minimal 2 huruf baru cari
+    if (keyword.length() < 2) {
+        popupPembeli.setVisible(false);
+        return;
+    }
+
+    popupPembeli.removeAll();
+
+    try (Connection conn = DBConnection.getConnection()) {
+
+        String sql = "SELECT id_pembeli, nama_pembeli, no_telepon, alamat " +
+                     "FROM pembeli WHERE LOWER(nama_pembeli) LIKE LOWER(?) LIMIT 10";
+
+        PreparedStatement ps = conn.prepareStatement(sql);
+        ps.setString(1, "%" + keyword + "%");
+
+        ResultSet rs = ps.executeQuery();
+
+        boolean found = false;
+
+        while (rs.next()) {
+            found = true;
+
+            String nama = rs.getString("nama_pembeli");
+            String telp = rs.getString("no_telepon");
+            String alamat = rs.getString("alamat");
+
+            javax.swing.JMenuItem item = new javax.swing.JMenuItem(nama);
+
+            item.addActionListener(e -> {
+                txtNamaPembeli.setText(nama);
+                txtTelepon.setText(telp);
+                txtAlamatPembeli.setText(alamat);
+                popupPembeli.setVisible(false);
+            });
+
+            popupPembeli.add(item);
+        }
+
+        if (found) {
+            popupPembeli.show(txtNamaPembeli, 0, txtNamaPembeli.getHeight());
+        } else {
+            popupPembeli.setVisible(false);
+        }
+
+    } catch (Exception e) {
+        e.printStackTrace();
+    }
+        }
+    });
+
+    
+    
+    
+    txtHiddenIdPenjualan.setVisible(false);
+
+
+    // Set title jendela
+    setTitle("Kasir Dashboard - " + namaUser);
+
+    // === Gunakan TEXTFIELD, bukan label ===
+    txtNamaKasir.setText(namaUser);
+    txtNamaKasir.setEditable(false);
+    
+    txtNamaKasir.setOpaque(false);
+    txtNamaKasir.setFocusable(false);
+
+    txtTanggal.setText(java.time.LocalDate.now().toString());
+    txtTanggal.setEditable(false);
+    
+    txtTanggal.setOpaque(false);
+    txtTanggal.setFocusable(false);
+
+    // Load barang ke combo
+    loadComboBarang();
+
+    // Fullscreen
+    this.setExtendedState(JFrame.MAXIMIZED_BOTH);
+
+    // Model tabel keranjang
+    tableKeranjang.setModel(new javax.swing.table.DefaultTableModel(
+        new Object [][] {},
+        new String [] {
+            "ID Barang", "Nama", "Harga", "Jumlah", "Subtotal"
+        }
+    ) {
+        boolean[] canEdit = new boolean [] {
+            false, false, false, true, false
+        };
+
+        public boolean isCellEditable(int row, int column) {
+            return canEdit[column];
+        }
+    });
+
+    // Listener update subtotal
+    DefaultTableModel modelKeranjang = (DefaultTableModel) tableKeranjang.getModel();
+
+    modelKeranjang.addTableModelListener(e -> {
+        int row = e.getFirstRow();
+        int col = e.getColumn();
+
+        if (col != 3) return;
+
+        try {
+            int jumlah = Integer.parseInt(modelKeranjang.getValueAt(row, 3).toString());
+            double harga = Double.parseDouble(modelKeranjang.getValueAt(row, 2).toString());
+            double subtotal = jumlah * harga;
+
+            modelKeranjang.setValueAt(subtotal, row, 4);
+
+            hitungTotal();
+            
+        } catch (Exception ex) {
+            JOptionPane.showMessageDialog(this, "Jumlah tidak valid!");
+        }
+    });
+}
+
+
+
+
+
+
+  
+
+
+
+    
+     
+      
+      
+    /**
+     * This method is called from within the constructor to initialize the form.
+     * WARNING: Do NOT modify this code. The content of this method is always
+     * regenerated by the Form Editor.
+     */
+    @SuppressWarnings("unchecked")
+    // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
+    private void initComponents() {
+
+        menuBar1 = new java.awt.MenuBar();
+        menu1 = new java.awt.Menu();
+        menu2 = new java.awt.Menu();
+        popupPembeli = new javax.swing.JPopupMenu();
+        panelMain = new javax.swing.JPanel();
+        PanelKiri = new javax.swing.JPanel();
+        jLabel1 = new javax.swing.JLabel();
+        btnLogout5 = new javax.swing.JButton();
+        jLabel14 = new javax.swing.JLabel();
+        ScrollTransaksi = new javax.swing.JScrollPane();
+        panelTransaksi = new javax.swing.JPanel();
+        jLabel2 = new javax.swing.JLabel();
+        comboBarang = new javax.swing.JComboBox<>();
+        jLabel4 = new javax.swing.JLabel();
+        jLabel5 = new javax.swing.JLabel();
+        txtStok = new javax.swing.JTextField();
+        txtHarga = new javax.swing.JTextField();
+        jLabel6 = new javax.swing.JLabel();
+        spinnerJumlah = new javax.swing.JSpinner();
+        btnHapusItem = new javax.swing.JButton();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        tableKeranjang = new javax.swing.JTable();
+        btnProsesPembayaran = new javax.swing.JButton();
+        jLabel7 = new javax.swing.JLabel();
+        jLabel8 = new javax.swing.JLabel();
+        txtTotal = new javax.swing.JTextField();
+        jLabel9 = new javax.swing.JLabel();
+        txtNamaPembeli = new javax.swing.JTextField();
+        jLabel10 = new javax.swing.JLabel();
+        txtTelepon = new javax.swing.JTextField();
+        jLabel11 = new javax.swing.JLabel();
+        txtAlamatPembeli = new javax.swing.JTextField();
+        btnTambahKeranjang = new javax.swing.JButton();
+        jLabel12 = new javax.swing.JLabel();
+        jLabel13 = new javax.swing.JLabel();
+        txtTanggal = new javax.swing.JTextField();
+        txtNamaKasir = new javax.swing.JTextField();
+        txtHiddenIdPenjualan = new javax.swing.JTextField();
+        jMenuBar = new javax.swing.JMenuBar();
+        Menu = new javax.swing.JMenu();
+        jMenuItemGantiPassword = new javax.swing.JMenuItem();
+        jMenuItemLogout = new javax.swing.JMenuItem();
+        Help = new javax.swing.JMenu();
+        jMenuItem1 = new javax.swing.JMenuItem();
+        jMenuItemAbout = new javax.swing.JMenuItem();
+
+        menu1.setLabel("File");
+        menuBar1.add(menu1);
+
+        menu2.setLabel("Edit");
+        menuBar1.add(menu2);
+
+        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
+
+        panelMain.setBackground(new java.awt.Color(204, 204, 204));
+        panelMain.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
+
+        PanelKiri.setBackground(new java.awt.Color(0, 51, 102));
+        PanelKiri.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
+
+        jLabel1.setFont(new java.awt.Font("Segoe UI", 1, 30)); // NOI18N
+        jLabel1.setForeground(new java.awt.Color(255, 255, 255));
+        jLabel1.setText("WELCOME KASIR");
+        PanelKiri.add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(70, 90, -1, -1));
+
+        btnLogout5.setBackground(new java.awt.Color(255, 0, 0));
+        btnLogout5.setFont(new java.awt.Font("Tahoma", 1, 18)); // NOI18N
+        btnLogout5.setForeground(new java.awt.Color(204, 255, 255));
+        btnLogout5.setText("LOG OUT");
+        btnLogout5.setBorder(javax.swing.BorderFactory.createMatteBorder(3, 3, 3, 3, new java.awt.Color(153, 0, 0)));
+        btnLogout5.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnLogout5ActionPerformed(evt);
+            }
+        });
+        PanelKiri.add(btnLogout5, new org.netbeans.lib.awtextra.AbsoluteConstraints(60, 700, 280, 40));
+
+        jLabel14.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cashier.png"))); // NOI18N
+        PanelKiri.add(jLabel14, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 180, 330, 350));
+
+        panelMain.add(PanelKiri, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 390, 1170));
+
+        ScrollTransaksi.setHorizontalScrollBarPolicy(javax.swing.ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
+        ScrollTransaksi.setVerticalScrollBarPolicy(javax.swing.ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
+
+        panelTransaksi.setBackground(new java.awt.Color(255, 255, 255));
+        panelTransaksi.setPreferredSize(new java.awt.Dimension(1920, 2500));
+        panelTransaksi.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
+
+        jLabel2.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
+        jLabel2.setText("Jumlah :");
+        panelTransaksi.add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(660, 260, -1, -1));
+
+        comboBarang.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                comboBarangMouseClicked(evt);
+            }
+        });
+        comboBarang.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                comboBarangActionPerformed(evt);
+            }
+        });
+        panelTransaksi.add(comboBarang, new org.netbeans.lib.awtextra.AbsoluteConstraints(290, 200, 270, 30));
+
+        jLabel4.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
+        jLabel4.setText("Tanggal :");
+        panelTransaksi.add(jLabel4, new org.netbeans.lib.awtextra.AbsoluteConstraints(660, 140, -1, -1));
+
+        jLabel5.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
+        jLabel5.setText("Harga :");
+        panelTransaksi.add(jLabel5, new org.netbeans.lib.awtextra.AbsoluteConstraints(140, 260, -1, -1));
+
+        txtStok.setEditable(false);
+        txtStok.setOpaque(true);
+        panelTransaksi.add(txtStok, new org.netbeans.lib.awtextra.AbsoluteConstraints(750, 200, 130, 30));
+
+        txtHarga.setEditable(false);
+        txtHarga.setOpaque(true);
+        panelTransaksi.add(txtHarga, new org.netbeans.lib.awtextra.AbsoluteConstraints(290, 260, 270, 30));
+
+        jLabel6.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
+        jLabel6.setText("Stok : ");
+        panelTransaksi.add(jLabel6, new org.netbeans.lib.awtextra.AbsoluteConstraints(660, 200, -1, -1));
+
+        spinnerJumlah.addChangeListener(new javax.swing.event.ChangeListener() {
+            public void stateChanged(javax.swing.event.ChangeEvent evt) {
+                spinnerJumlahStateChanged(evt);
+            }
+        });
+        panelTransaksi.add(spinnerJumlah, new org.netbeans.lib.awtextra.AbsoluteConstraints(750, 260, 130, 30));
+
+        btnHapusItem.setBackground(new java.awt.Color(255, 0, 0));
+        btnHapusItem.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
+        btnHapusItem.setForeground(new java.awt.Color(255, 255, 255));
+        btnHapusItem.setText("HAPUS ITEM");
+        btnHapusItem.setBorder(javax.swing.BorderFactory.createMatteBorder(2, 2, 2, 2, new java.awt.Color(153, 0, 0)));
+        btnHapusItem.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnHapusItemActionPerformed(evt);
+            }
+        });
+        panelTransaksi.add(btnHapusItem, new org.netbeans.lib.awtextra.AbsoluteConstraints(660, 590, 220, 50));
+
+        tableKeranjang.setBorder(javax.swing.BorderFactory.createMatteBorder(2, 2, 2, 2, new java.awt.Color(0, 0, 102)));
+        tableKeranjang.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        tableKeranjang.setForeground(new java.awt.Color(0, 0, 102));
+        tableKeranjang.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+                {null, null, null, null, null},
+                {null, null, null, null, null},
+                {null, null, null, null, null},
+                {null, null, null, null, null}
+            },
+            new String [] {
+                "ID Barang", "Nama", "Harga", "Jumlah", "Subtotal"
+            }
+        ));
+        jScrollPane1.setViewportView(tableKeranjang);
+
+        panelTransaksi.add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(130, 410, 750, 150));
+
+        btnProsesPembayaran.setBackground(new java.awt.Color(0, 51, 153));
+        btnProsesPembayaran.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
+        btnProsesPembayaran.setForeground(new java.awt.Color(255, 255, 255));
+        btnProsesPembayaran.setText("PROSES PEMBAYARAN");
+        btnProsesPembayaran.setBorder(javax.swing.BorderFactory.createMatteBorder(2, 2, 2, 2, new java.awt.Color(0, 204, 204)));
+        btnProsesPembayaran.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnProsesPembayaranActionPerformed(evt);
+            }
+        });
+        panelTransaksi.add(btnProsesPembayaran, new org.netbeans.lib.awtextra.AbsoluteConstraints(130, 1150, 740, 50));
+
+        jLabel7.setFont(new java.awt.Font("Segoe UI", 1, 27)); // NOI18N
+        jLabel7.setText("TRANSAKSI PENJUALAN");
+        panelTransaksi.add(jLabel7, new org.netbeans.lib.awtextra.AbsoluteConstraints(370, 40, -1, -1));
+
+        jLabel8.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
+        jLabel8.setText("Total :");
+        panelTransaksi.add(jLabel8, new org.netbeans.lib.awtextra.AbsoluteConstraints(130, 1050, 60, -1));
+
+        txtTotal.setEditable(false);
+        panelTransaksi.add(txtTotal, new org.netbeans.lib.awtextra.AbsoluteConstraints(290, 1050, 280, 30));
+
+        jLabel9.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
+        jLabel9.setText("Nama Pembeli :");
+        panelTransaksi.add(jLabel9, new org.netbeans.lib.awtextra.AbsoluteConstraints(130, 820, 140, -1));
+        panelTransaksi.add(txtNamaPembeli, new org.netbeans.lib.awtextra.AbsoluteConstraints(290, 820, 280, 30));
+
+        jLabel10.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
+        jLabel10.setText("No Telepon :");
+        panelTransaksi.add(jLabel10, new org.netbeans.lib.awtextra.AbsoluteConstraints(130, 880, 120, -1));
+
+        txtTelepon.setEditable(false);
+        panelTransaksi.add(txtTelepon, new org.netbeans.lib.awtextra.AbsoluteConstraints(290, 880, 280, 30));
+
+        jLabel11.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
+        jLabel11.setText("Alamat :");
+        panelTransaksi.add(jLabel11, new org.netbeans.lib.awtextra.AbsoluteConstraints(130, 940, 80, -1));
+
+        txtAlamatPembeli.setEditable(false);
+        panelTransaksi.add(txtAlamatPembeli, new org.netbeans.lib.awtextra.AbsoluteConstraints(290, 940, 280, 30));
+
+        btnTambahKeranjang.setBackground(new java.awt.Color(0, 153, 0));
+        btnTambahKeranjang.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
+        btnTambahKeranjang.setForeground(new java.awt.Color(255, 255, 255));
+        btnTambahKeranjang.setText("TAMBAH KERANJANG");
+        btnTambahKeranjang.setBorder(javax.swing.BorderFactory.createMatteBorder(2, 2, 2, 2, new java.awt.Color(0, 102, 0)));
+        btnTambahKeranjang.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnTambahKeranjangActionPerformed(evt);
+            }
+        });
+        panelTransaksi.add(btnTambahKeranjang, new org.netbeans.lib.awtextra.AbsoluteConstraints(660, 320, 220, 50));
+
+        jLabel12.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
+        jLabel12.setText("Pilih Barang :");
+        panelTransaksi.add(jLabel12, new org.netbeans.lib.awtextra.AbsoluteConstraints(140, 200, -1, -1));
+
+        jLabel13.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
+        jLabel13.setText("Nama Kasir : ");
+        panelTransaksi.add(jLabel13, new org.netbeans.lib.awtextra.AbsoluteConstraints(140, 140, -1, -1));
+        panelTransaksi.add(txtTanggal, new org.netbeans.lib.awtextra.AbsoluteConstraints(750, 140, 130, 30));
+
+        txtNamaKasir.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                txtNamaKasirActionPerformed(evt);
+            }
+        });
+        panelTransaksi.add(txtNamaKasir, new org.netbeans.lib.awtextra.AbsoluteConstraints(290, 140, 270, 30));
+        panelTransaksi.add(txtHiddenIdPenjualan, new org.netbeans.lib.awtextra.AbsoluteConstraints(70, 1690, 80, 40));
+
+        ScrollTransaksi.setViewportView(panelTransaksi);
+
+        panelMain.add(ScrollTransaksi, new org.netbeans.lib.awtextra.AbsoluteConstraints(390, 0, 1143, 1800));
+
+        getContentPane().add(panelMain, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 1920, 1080));
+
+        jMenuBar.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
+
+        Menu.setText("Profile");
+        Menu.setFont(new java.awt.Font("Segoe UI", 1, 15)); // NOI18N
+
+        jMenuItemGantiPassword.setText("Ubah Password");
+        jMenuItemGantiPassword.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItemGantiPasswordActionPerformed(evt);
+            }
+        });
+        Menu.add(jMenuItemGantiPassword);
+
+        jMenuItemLogout.setText("Log Out");
+        jMenuItemLogout.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItemLogoutActionPerformed(evt);
+            }
+        });
+        Menu.add(jMenuItemLogout);
+
+        jMenuBar.add(Menu);
+
+        Help.setText("Menu");
+        Help.setFont(new java.awt.Font("Segoe UI", 1, 15)); // NOI18N
+
+        jMenuItem1.setText("Refresh");
+        jMenuItem1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem1ActionPerformed(evt);
+            }
+        });
+        Help.add(jMenuItem1);
+
+        jMenuItemAbout.setText("Tentang Kasir");
+        jMenuItemAbout.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItemAboutActionPerformed(evt);
+            }
+        });
+        Help.add(jMenuItemAbout);
+
+        jMenuBar.add(Help);
+
+        setJMenuBar(jMenuBar);
+
+        pack();
+    }// </editor-fold>//GEN-END:initComponents
+
+    private void jMenuItemGantiPasswordActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItemGantiPasswordActionPerformed
+           int pilih = JOptionPane.showConfirmDialog(
+            this,
+            "Yakin mau pindah ke halaman ubah password?",
+            "Konfirmasi",
+            JOptionPane.YES_NO_OPTION,
+            JOptionPane.QUESTION_MESSAGE
+    );
+
+    if (pilih == JOptionPane.YES_OPTION) {
+        JOptionPane.showMessageDialog(
+                this,
+                "Membuka form ubah password...",
+                "Informasi",
+                JOptionPane.INFORMATION_MESSAGE
+        );
+
+        new ForgotPasswordFrame().setVisible(true);
+        dispose(); // opsional, sama kayak tadi
+    } else {
+        JOptionPane.showMessageDialog(
+                this,
+                "Aksi dibatalkan.",
+                "Informasi",
+                JOptionPane.INFORMATION_MESSAGE
+        );
+    }
+
+    new ForgotPasswordFrame().setVisible(true);
+    dispose();        // TODO add your handling code here:
+    }//GEN-LAST:event_jMenuItemGantiPasswordActionPerformed
+
+    private void jMenuItemLogoutActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItemLogoutActionPerformed
+        int confirm = JOptionPane.showConfirmDialog(
+        this,
+        "Yakin ingin logout?",
+        "Konfirmasi Logout",
+        JOptionPane.YES_NO_OPTION
+    );
+
+    if (confirm == JOptionPane.YES_OPTION) {
+        JOptionPane.showMessageDialog(this, 
+            "Logout berhasil!",
+            "Informasi",
+            JOptionPane.INFORMATION_MESSAGE);
+
+        new LoginFrame().setVisible(true);
+        dispose();
+    }        // TODO add your handling code here:
+    }//GEN-LAST:event_jMenuItemLogoutActionPerformed
+
+    private void jMenuItemAboutActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItemAboutActionPerformed
+       JOptionPane.showMessageDialog(
+            this,
+            "Sistem Kasir\n" +
+            "Versi 1.0\n\n" +
+            "Aplikasi ini digunakan untuk membantu kasir\n" +
+            "mengelola transaksi penjualan secara cepat,\n" +
+            "akurat, dan efisien.\n\n" +
+            "Dikembangkan oleh: Bang Ryoooo Team",
+            "Tentang Kasir",
+            JOptionPane.INFORMATION_MESSAGE
+    );  // TODO add your handling code here:
+    }//GEN-LAST:event_jMenuItemAboutActionPerformed
+
+    private void btnLogout5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLogout5ActionPerformed
+            int confirm = JOptionPane.showConfirmDialog(
+        this, 
+        "Yakin ingin logout?", 
+        "Konfirmasi Logout", 
+        JOptionPane.YES_NO_OPTION
+    );
+
+    if (confirm == JOptionPane.YES_OPTION) {
+        new LoginFrame().setVisible(true);
+        this.dispose(); 
+    } 
+    }//GEN-LAST:event_btnLogout5ActionPerformed
+
+    private void btnHapusItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnHapusItemActionPerformed
+         int selected = tableKeranjang.getSelectedRow();
+
+    if (selected < 0) {
+        JOptionPane.showMessageDialog(this, "Pilih item yang mau dihapus!");
+        return;
+    }
+
+    DefaultTableModel model = (DefaultTableModel) tableKeranjang.getModel();
+    model.removeRow(selected);
+    JOptionPane.showMessageDialog(this,
+    "Item berhasil dihapus dari keranjang.",
+    "Dihapus",
+    JOptionPane.WARNING_MESSAGE
+);
+
+
+    hitungTotal(); // update total
+    }//GEN-LAST:event_btnHapusItemActionPerformed
+
+    private void btnProsesPembayaranActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnProsesPembayaranActionPerformed
+   
+    String namaPembeli = txtNamaPembeli.getText().trim();
+    String telepon = txtTelepon.getText().trim();
+    String alamat = txtAlamatPembeli.getText().trim();
+
+    String idPembeli = null;
+
+    if (!namaPembeli.isEmpty() || !telepon.isEmpty() || !alamat.isEmpty()) {
+        idPembeli = simpanPembeliJikaBaru(namaPembeli, telepon, alamat);
+    }
+
+    // =============================
+    // 2. Generate ID Penjualan bila belum ada
+    // =============================
+
+   String idPenjualan = txtHiddenIdPenjualan.getText();
+
+if (idPenjualan == null || idPenjualan.isEmpty()) {
+    idPenjualan = buatPenjualanBaru();
+    txtHiddenIdPenjualan.setText(idPenjualan);
+}
+
+// === FIX PEMBELI MASUK KE PENJUALAN ===
+if (idPembeli != null) {
+    updatePembeliKePenjualan(idPenjualan, idPembeli);
+}
+
+    // =============================
+    // 3. Hitung total dan kirim ke dialog pembayaran
+    // =============================
+
+    double total = Double.parseDouble(txtTotal.getText());
+    // === FIX WAJIB: Simpan total ke tabel penjualan ===
+    updateTotalPenjualan(idPenjualan, total);
+
+    
+    
+    DialogPembayaran d = new DialogPembayaran(this, idPenjualan, total, tableKeranjang, namaUser);
+
+
+    d.setLocationRelativeTo(this);
+    d.setVisible(true);
+
+    // =============================
+    // 4. RESET form setelah selesai
+    // =============================
+
+    txtHiddenIdPenjualan.setText("");
+
+    DefaultTableModel model = (DefaultTableModel) tableKeranjang.getModel();
+    model.setRowCount(0);
+
+    txtTotal.setText("");
+
+    txtNamaPembeli.setText("");
+    txtTelepon.setText("");
+    txtAlamatPembeli.setText("");
+
+    }//GEN-LAST:event_btnProsesPembayaranActionPerformed
+
+    private void btnTambahKeranjangActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnTambahKeranjangActionPerformed
+    int index = comboBarang.getSelectedIndex();
+    if (index < 0) {
+        JOptionPane.showMessageDialog(this, "Pilih barang dulu!");
+        return;
+    }
+
+    // Ambil barang berdasarkan index
+    Barang b = listBarang.get(index);
+
+    int jumlah = (int) spinnerJumlah.getValue();
+    if (jumlah <= 0) {
+        JOptionPane.showMessageDialog(this, "Jumlah harus lebih dari 0!");
+        return;
+    }
+
+    if (jumlah > b.getStock()) {
+        JOptionPane.showMessageDialog(this, "Jumlah melebihi stok!");
+        return;
+    }
+
+    // Cek duplicate item di keranjang
+    DefaultTableModel model = (DefaultTableModel) tableKeranjang.getModel();
+    for (int i = 0; i < model.getRowCount(); i++) {
+        Object idObj = model.getValueAt(i, 0);
+        if (idObj != null && idObj.toString().equals(b.getIdBarang())) {
+            JOptionPane.showMessageDialog(this, "Barang sudah ada dalam keranjang!");
+            return;
+        }
+    }
+
+    // Hitung subtotal
+    double subtotal = jumlah * b.getHarga();
+
+    // Tambah ke tabel
+    model.addRow(new Object[]{
+        b.getIdBarang(),
+        b.getNamaBarang(),
+        b.getHarga(),
+        jumlah,
+        subtotal
+    });
+    JOptionPane.showMessageDialog(this,
+    "Barang berhasil ditambahkan ke keranjang!",
+    "Sukses",
+    JOptionPane.INFORMATION_MESSAGE
+);
+
+
+    // Update total
+    hitungTotal();          // TODO add your handling code here:
+    }//GEN-LAST:event_btnTambahKeranjangActionPerformed
+
+    private void comboBarangActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_comboBarangActionPerformed
+    int index = comboBarang.getSelectedIndex();
+    if (index < 0) return;
+
+    Barang b = listBarang.get(index);
+
+    txtHarga.setText(String.valueOf(b.getHarga()));
+    txtStok.setText(String.valueOf(b.getStock()));
+
+    spinnerJumlah.setValue(0);        // TODO add your handling code here:
+    }//GEN-LAST:event_comboBarangActionPerformed
+
+    private void comboBarangMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_comboBarangMouseClicked
+        // TODO add your handling code here:
+    }//GEN-LAST:event_comboBarangMouseClicked
+
+    private void spinnerJumlahStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_spinnerJumlahStateChanged
+    int index = comboBarang.getSelectedIndex();
+    if (index < 0) return;
+
+    Barang b = listBarang.get(index);
+    int max = b.getStock();
+    int val = (int) spinnerJumlah.getValue();
+
+    if (val > max) {
+        spinnerJumlah.setValue(max);
+    }
+    if (val < 0) {
+        spinnerJumlah.setValue(0);
+    }        // TODO add your handling code here:
+    }//GEN-LAST:event_spinnerJumlahStateChanged
+
+    private void txtNamaKasirActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtNamaKasirActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_txtNamaKasirActionPerformed
+
+    private void jMenuItem1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem1ActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jMenuItem1ActionPerformed
+
+    /**
+     * @param args the command line arguments
+     */
+  
+    
+    private BarangService barangService = new BarangService();
+private List<Barang> listBarang = new ArrayList<>();
+
+private void loadComboBarang() {
+    comboBarang.removeAllItems();
+    listBarang = barangService.getAll();
+
+    for (Barang b : listBarang) {
+        comboBarang.addItem(b.getNamaBarang());
+    }
+}
+
+    private void hitungTotal() {
+    DefaultTableModel model = (DefaultTableModel) tableKeranjang.getModel();
+    double total = 0;
+
+    for (int i = 0; i < model.getRowCount(); i++) {
+        Object val = model.getValueAt(i, 4); // kolom subtotal
+        if (val != null) {
+            total += Double.parseDouble(val.toString());
+        }
+    }
+
+    txtTotal.setText(String.valueOf(total));
+}
+
+
+
+    
+    // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JMenu Help;
+    private javax.swing.JMenu Menu;
+    private javax.swing.JPanel PanelKiri;
+    private javax.swing.JScrollPane ScrollTransaksi;
+    private javax.swing.JButton btnHapusItem;
+    private javax.swing.JButton btnLogout5;
+    private javax.swing.JButton btnProsesPembayaran;
+    private javax.swing.JButton btnTambahKeranjang;
+    private javax.swing.JComboBox<String> comboBarang;
+    private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel10;
+    private javax.swing.JLabel jLabel11;
+    private javax.swing.JLabel jLabel12;
+    private javax.swing.JLabel jLabel13;
+    private javax.swing.JLabel jLabel14;
+    private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel4;
+    private javax.swing.JLabel jLabel5;
+    private javax.swing.JLabel jLabel6;
+    private javax.swing.JLabel jLabel7;
+    private javax.swing.JLabel jLabel8;
+    private javax.swing.JLabel jLabel9;
+    private javax.swing.JMenuBar jMenuBar;
+    private javax.swing.JMenuItem jMenuItem1;
+    private javax.swing.JMenuItem jMenuItemAbout;
+    private javax.swing.JMenuItem jMenuItemGantiPassword;
+    private javax.swing.JMenuItem jMenuItemLogout;
+    private javax.swing.JScrollPane jScrollPane1;
+    private java.awt.Menu menu1;
+    private java.awt.Menu menu2;
+    private java.awt.MenuBar menuBar1;
+    private javax.swing.JPanel panelMain;
+    private javax.swing.JPanel panelTransaksi;
+    private javax.swing.JPopupMenu popupPembeli;
+    private javax.swing.JSpinner spinnerJumlah;
+    private javax.swing.JTable tableKeranjang;
+    private javax.swing.JTextField txtAlamatPembeli;
+    private javax.swing.JTextField txtHarga;
+    private javax.swing.JTextField txtHiddenIdPenjualan;
+    private javax.swing.JTextField txtNamaKasir;
+    private javax.swing.JTextField txtNamaPembeli;
+    private javax.swing.JTextField txtStok;
+    private javax.swing.JTextField txtTanggal;
+    private javax.swing.JTextField txtTelepon;
+    private javax.swing.JTextField txtTotal;
+    // End of variables declaration//GEN-END:variables
+
+    
+    private String buatPenjualanBaru() {
+    try (Connection conn = DBConnection.getConnection()) {
+
+        // generate id
+        String id = util.IdGenerator.generateId(conn, "penjualan", "id_penjualan", "PJ");
+
+        // insert transaksi baru
+        String sql = "INSERT INTO penjualan(id_penjualan, id_pegawai, tanggal, total, status_pembayaran) "
+                   + "VALUES(?, ?, CURRENT_DATE, 0, 'BELUM')";
+        PreparedStatement ps = conn.prepareStatement(sql);
+
+        ps.setString(1, id);
+        ps.setString(2, idPegawaiLogin);
+        ps.executeUpdate();
+
+        return id;
+
+    } catch (Exception e) {
+        e.printStackTrace();
+        return null;
+    }
+}
+    
+private String simpanPembeliJikaBaru(String nama, String telepon, String alamat) {
+    if (nama.isEmpty() && telepon.isEmpty() && alamat.isEmpty()) {
+        return null;
+    }
+
+    try (Connection conn = DBConnection.getConnection()) {
+
+        // ============================
+        // 1. CEK BERDASARKAN TELEPON
+        // ============================
+        if (!telepon.isEmpty()) {
+            String cekTelp = "SELECT id_pembeli FROM pembeli WHERE no_telepon = ?";
+            PreparedStatement ps1 = conn.prepareStatement(cekTelp);
+            ps1.setString(1, telepon);
+            ResultSet rs1 = ps1.executeQuery();
+
+            if (rs1.next()) {
+                return rs1.getString(1);
+            }
+        }
+
+        // ============================
+        // 2. CEK BERDASARKAN NAMA
+        // ============================
+        if (!nama.isEmpty()) {
+            String cekNama = "SELECT id_pembeli FROM pembeli WHERE nama_pembeli = ?";
+            PreparedStatement ps2 = conn.prepareStatement(cekNama);
+            ps2.setString(1, nama);
+            ResultSet rs2 = ps2.executeQuery();
+
+            if (rs2.next()) {
+                return rs2.getString(1);
+            }
+        }
+
+        // ============================
+        // 3. GENERATE ID BARU
+        // ============================
+        String sqlLast = "SELECT id_pembeli FROM pembeli ORDER BY id_pembeli DESC LIMIT 1";
+        PreparedStatement psLast = conn.prepareStatement(sqlLast);
+        ResultSet rsLast = psLast.executeQuery();
+
+        String newId = "P001";
+        if (rsLast.next()) {
+            String last = rsLast.getString(1).substring(1);
+            int next = Integer.parseInt(last) + 1;
+            newId = "P" + String.format("%03d", next);
+        }
+
+        // ============================
+        // 4. INSERT PEMBELI BARU
+        // ============================
+        String sql = "INSERT INTO pembeli(id_pembeli, nama_pembeli, no_telepon, alamat) VALUES (?, ?, ?, ?)";
+        PreparedStatement ps = conn.prepareStatement(sql);
+
+        ps.setString(1, newId);
+        ps.setString(2, nama);
+        ps.setString(3, telepon.isEmpty() ? null : telepon);
+        ps.setString(4, alamat);
+        ps.executeUpdate();
+
+        return newId;
+
+    } catch (Exception e) {
+        e.printStackTrace();
+        return null;
+    }
+}
+private void updatePembeliKePenjualan(String idPenjualan, String idPembeli) {
+    try (Connection conn = DBConnection.getConnection()) {
+
+        String sql = "UPDATE penjualan SET id_pembeli = ? WHERE id_penjualan = ?";
+        PreparedStatement ps = conn.prepareStatement(sql);
+
+        ps.setString(1, idPembeli);
+        ps.setString(2, idPenjualan);
+        ps.executeUpdate();
+
+    } catch (Exception e) {
+        e.printStackTrace();
+    }
+}
+
+    private void updateTotalPenjualan(String idPenjualan, double total) {
+    try (Connection conn = DBConnection.getConnection()) {
+        String sql = "UPDATE penjualan SET total = ? WHERE id_penjualan = ?";
+        PreparedStatement ps = conn.prepareStatement(sql);
+        ps.setDouble(1, total);
+        ps.setString(2, idPenjualan);
+        ps.executeUpdate();
+    } catch (Exception e) {
+        e.printStackTrace();
+    }
+}
+
+
+
+
+
+
+    
+}
